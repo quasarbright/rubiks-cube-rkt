@@ -489,7 +489,6 @@
     (define (pop!) (define pzl (first queue)) (set! queue (rest queue)) pzl)
     (define (push*! items) (set! queue (append queue items)))
     (let loop ()
-      (displayln 'loop)
       (unless (empty? queue)
         (match-define (list pzl moves-rev) (pop!))
         (when (solved? pzl)
