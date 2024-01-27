@@ -444,8 +444,35 @@
   (define pzl/oll (solve/3x3-cfop/oll pzl/f2l))
   (define pzl/pll (solve/3x3-cfop/pll pzl/oll)))
 
-#;(define (solve/3x3-cfop/cross pzl)
+(define (solve/3x3-cfop/cross pzl)
   (solve/search pzl 3x3-cfop/cross? 8))
+
+(module+ test
+  (test-case "solve cfop cross"
+    (define pzl (scramble (solved-3x3-cube)))
+    (displayln 'foo)
+    (match-define (list crossed _) (solve/3x3-cfop/cross pzl))
+    (check-true (3x3-cfop/cross? crossed))
+    (displayln (display-3x3 crossed))))
+
+; Is the white cross solved?
+(define (3x3-cfop/cross? pzl)
+  (define specs
+    (list (make-edge-spec WHITE RED)
+          (make-edge-spec RED WHITE)
+          (make-edge-spec WHITE BLUE)
+          (make-edge-spec BLUE WHITE)
+          (make-edge-spec WHITE ORANGE)
+          (make-edge-spec ORANGE WHITE)
+          (make-edge-spec WHITE GREEN)
+          (make-edge-spec GREEN WHITE)))
+  (puzzle-specs-solved? pzl specs))
+
+; Are all the given specs solved for the puzzle?
+(define (puzzle-specs-solved? pzl specs)
+  (for/and ([spec specs])
+    (equal? (puzzle-sticker-color pzl spec)
+            (spec-face-color spec))))
 
 
 ; Puzzle (Puzzle -> Boolean) [Natural] -> (or/c #f (list Puzzle (listof FaceMove)))
@@ -462,6 +489,7 @@
     (define (pop!) (define pzl (first queue)) (set! queue (rest queue)) pzl)
     (define (push*! items) (set! queue (append queue items)))
     (let loop ()
+      (displayln 'loop)
       (unless (empty? queue)
         (match-define (list pzl moves-rev) (pop!))
         (when (solved? pzl)
